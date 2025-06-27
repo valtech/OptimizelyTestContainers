@@ -32,7 +32,19 @@ public class OptimizelyDataImporter(ILogger<OptimizelyDataImporter> logger, IDat
 
         var errors = importLog.Errors.ToList();
         var warnings = importLog.Warnings.ToList();
-        
-        // TODO: Throw on error(s) and log warnings
+
+        if (errors.Any())
+        {
+            throw new Exception(errors.First());
+        }
+
+        if (warnings.Any())
+        {
+            foreach (var warning in warnings)
+            {
+                logger.LogWarning(warning);
+                Console.WriteLine(warning);
+            }
+        }
     }
 }
