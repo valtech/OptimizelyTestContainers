@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Web/Optimizely.TestContainers.csproj" />
+  <Project Path="test/OptimizelyTestContainers.Tests/OptimizelyTestContainers.Tests.csproj" />
+</Solution>
