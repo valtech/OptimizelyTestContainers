@@ -1,5 +1,4 @@
-﻿using Castle.DynamicProxy.Generators.Emitters;
-using EPiServer.Core;
+﻿using EPiServer.Core;
 using EPiServer.Core.Transfer;
 using EPiServer.Enterprise;
 using Microsoft.Extensions.Logging;
@@ -22,8 +21,6 @@ public class OptimizelyDataImporter(ILogger<OptimizelyDataImporter> logger, IDat
             KeepIdentity = true,
             EnsureContentNameUniqueness = false,
             ValidateDestination = true,
-            //ValidateContent = true,
-            //ImportFiles = true,
             TransferType = TypeOfTransfer.Importing,
             AutoCloseStream = true,
         };
@@ -33,18 +30,20 @@ public class OptimizelyDataImporter(ILogger<OptimizelyDataImporter> logger, IDat
         var errors = importLog.Errors.ToList();
         var warnings = importLog.Warnings.ToList();
 
-        if (errors.Any())
+        if (errors.Count != 0)
         {
             throw new Exception(errors.First());
         }
 
-        if (warnings.Any())
+        if (warnings.Count == 0)
         {
-            foreach (var warning in warnings)
-            {
-                logger.LogWarning(warning);
-                Console.WriteLine(warning);
-            }
+            return;
+        }
+        
+        foreach (var warning in warnings)
+        {
+            logger.LogWarning(warning);
+            Console.WriteLine(warning);
         }
     }
 }
