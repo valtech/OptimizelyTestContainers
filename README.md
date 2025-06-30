@@ -2,4 +2,4 @@ Example of using TestContainers:
 
 https://testcontainers.com/
 
-with Optimizely to setup an empty Alloy site and run Optimizely code on it to perform integration tests
+with Optimizely to setup an empty Optimizely CMS website and run xUnit tests on it to perform integration tests
