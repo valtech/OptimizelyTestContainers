@@ -20,18 +20,14 @@ public class NewsPageIntegrationTest : OptimizelyIntegrationTestBase
         // Import test data
         var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
-        
         var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
         dataImporter.Import(episerverDataFile);
         
-        
         // Find StartPage from root
-        // Setup site definition
-        
         var startPage = repo.GetChildren<StartPage>(ContentReference.RootPage).First();
         
+        // Setup site definition
         var siteDefinitionRepo = Services.GetRequiredService<ISiteDefinitionRepository>();
-        
         siteDefinitionRepo.Save(new SiteDefinition()
         {
             Name = "TestSite",
@@ -39,15 +35,16 @@ public class NewsPageIntegrationTest : OptimizelyIntegrationTestBase
             SiteUrl = new Uri("http://localhost"),
         });
 
+        // Find first site
         var allSites = siteDefinitionRepo.List();
-
         var site = allSites.First();
         
+        // Create NewsPage
         var news = repo.GetDefault<NewsPage>(site.StartPage);
         news.Name = "Alien Invasion";
         news.Title = "Martians Landed in Stockholm";
 
-        // Act
+        // Act (Save and Load NewsPage)
         var savedRef = repo.Save(news, SaveAction.Publish, AccessLevel.NoAccess);
         var loaded = repo.Get<NewsPage>(savedRef);
 

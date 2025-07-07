@@ -37,14 +37,6 @@ public class OptimizelyIntegrationTestBase : IAsyncLifetime
             {
                 webBuilder.ConfigureServices((context, services) =>
                 {
-                    // Add CMS services
-                    services.AddCms();
-                    services.AddCmsHost();
-                    services.AddCmsFrameworkWeb();
-                    services.AddCmsCoreWeb(); 
-                    services.AddCmsTemplating();
-                    services.AddCmsUI();
-
                     // Override connection string to use container connection
                     services.Configure<DataAccessOptions>(opt =>
                     {

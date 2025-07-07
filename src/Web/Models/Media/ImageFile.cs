@@ -12,5 +12,5 @@ public class ImageFile : ImageData
     /// <value>
     /// The copyright.
     /// </value>
-    public virtual string Copyright { get; set; }
+    public virtual string Copyright { get; set; } = null!;
 }

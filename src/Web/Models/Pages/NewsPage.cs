@@ -5,5 +5,5 @@
     DisplayName = "News Page")]
 public class NewsPage : PageData
 {
-    public virtual string Title { get; set; }
+    public virtual string Title { get; set; } = null!;
 }
