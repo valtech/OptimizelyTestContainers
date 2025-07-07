@@ -11,11 +11,11 @@ public class VideoFile : VideoData
     /// <summary>
     /// Gets or sets the copyright.
     /// </summary>
-    public virtual string Copyright { get; set; }
+    public virtual string Copyright { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the URL to the preview image.
     /// </summary>
     [UIHint(UIHint.Image)]
-    public virtual ContentReference PreviewImage { get; set; }
+    public virtual ContentReference PreviewImage { get; set; } = null!;
 }

@@ -6,5 +6,5 @@ public class GenericMedia : MediaData
     /// <summary>
     /// Gets or sets the description.
     /// </summary>
-    public virtual String Description { get; set; }
+    public virtual string Description { get; set; } = null!;
 }
