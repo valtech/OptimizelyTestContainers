@@ -27,6 +27,7 @@ public class Startup
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
             .AddCms()
+            .AddCommerce()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
     }
