@@ -1,4 +1,5 @@
-﻿using EPiServer.Framework;
+﻿using EPiServer.Data;
+using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ public class OptimizelyCmsIntegrationTestBase : IAsyncLifetime
     {
         // Start SQL Server container
         CmsDbContainer = new MsSqlBuilder()
+            .WithName("Cms")
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
             .WithPassword("yourStrong(!)Password")
             .Build();
@@ -29,12 +31,17 @@ public class OptimizelyCmsIntegrationTestBase : IAsyncLifetime
         // Build CMS host
         _host = Host.CreateDefaultBuilder()
             .ConfigureCmsDefaults()
-            .ConfigureWebHostDefaults(CustomizebHostDetaults)
+            .ConfigureWebHostDefaults(webHost =>
+            {
+                CustomizebHostDetaults(webHost);
+
+                webHost.UseStartup<Startup>();
+            })
             .Build();
         
-        await _host.StartAsync();
-
         CustomizeStartup();
+        
+        await _host.StartAsync();
         
         Services = _host.Services;
     }
@@ -43,21 +50,16 @@ public class OptimizelyCmsIntegrationTestBase : IAsyncLifetime
     {
         webBuilder.ConfigureServices((context, services) =>
         {
-            /*
             services.Configure<DataAccessOptions>(opt =>
             {
                 var containerConnectionString = CmsDbContainer.GetConnectionString();
 
                 opt.SetConnectionString(containerConnectionString);
             });
-            */
-
+            
             // Add data importer service to setup default content for the tests
             services.AddTransient<OptimizelyDataImporter>();
         });
-        
-        // Use the Alloy startup by default
-        webBuilder.UseStartup<Startup>();
     }
 
     public virtual void CustomizeStartup()

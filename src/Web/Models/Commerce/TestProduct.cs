@@ -18,5 +18,5 @@ public class TestProduct : ProductContent
     [CultureSpecific]
     [Tokenize]
     [IncludeInDefaultSearch]
-    public XhtmlString? Description { get; set; }
+    public virtual XhtmlString? Description { get; set; }
 }

@@ -14,6 +14,7 @@ public class OptimizelyCommerceIntegrationTestBase : OptimizelyCmsIntegrationTes
         
         // Start SQL Server container
         CommerceDbContainer = new MsSqlBuilder()
+            .WithName("Commerce")
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
             .WithPassword("yourStrong(!)Password")
             .Build();
@@ -23,25 +24,22 @@ public class OptimizelyCommerceIntegrationTestBase : OptimizelyCmsIntegrationTes
 
     public override void CustomizebHostDetaults(IWebHostBuilder webBuilder)
     {
-
+        base.CustomizebHostDetaults(webBuilder);
+        
         webBuilder.ConfigureAppConfiguration((context, configBuilder) =>
         {
             var testSettings = new Dictionary<string, string?>
             {
-                //["ConnectionStrings:EPiServerDB"] = CmsDbContainer.GetConnectionString(),
-                ["ConnectionStrings:EcfSqlConnection"] = CommerceDbContainer.GetConnectionString(),
+                ["ConnectionStrings:EcfSqlConnection"] = CommerceDbContainer.GetConnectionString()
             };
 
             configBuilder.AddInMemoryCollection(testSettings);
         });
-        
-        base.CustomizebHostDetaults(webBuilder);
     }
 
     public override void CustomizeStartup()
     {
-        // TOOD: No-op for now
-        base.CustomizeStartup();
+        // TODO: If need to add more Commerce specific initialization
     }
 
     public override async Task DisposeAsync()
