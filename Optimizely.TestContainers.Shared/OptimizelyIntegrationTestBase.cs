@@ -53,41 +53,20 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
                     })
                     .ConfigureAppConfiguration((context, configBuilder) =>
                     {
-                        // Workaround to set separate database names inisde container
-                        /*if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
-                        {*/
-                            var testSettings = new Dictionary<string, string?>
-                            {
-                                // TODO: Find Constant for connection string!
-                                ["ConnectionStrings:EPiServerDB"] = cmsDatabaseConnectionString,
-                                ["ConnectionStrings:EcfSqlConnection"] = commerceDatabaseConnectionString,
-                            };
+                        var testSettings = new Dictionary<string, string?>
+                        {
+                            ["ConnectionStrings:EPiServerDB"] = cmsDatabaseConnectionString,
+                            ["ConnectionStrings:EcfSqlConnection"] = commerceDatabaseConnectionString,
+                        };
 
-                            configBuilder.AddInMemoryCollection(testSettings);
-                        /*}*/
+                        configBuilder.AddInMemoryCollection(testSettings);
                     });
                 
+                // To configure aps separately with Cms and Commerce Statup files in separate projects
                 ConfiureWebHostBuilder(webHostBuilder); 
-                
-                // TOOD: Run startup in each test project!
-                /*if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
-                {
-                    webHostBuilder.UseStartup<Optimizely.TestContainers.Startup>();
-                }
-                else
-                {
-                    webHostBuilder.UseStartup<StartupWithCms>(); 
-                }*/
-                
-                
-
             })
             .ConfigureCmsDefaults()
            .Build();
-
-        // TOOD:Try to remove this as well!
-        //AssemblyScanner.ExcludedAssemblies.Add("Mediachase");
-        //AssemblyScanner.ExcludedAssemblies.Add("EPiServer.Commerce");
         
         // Run initialization engine (simulate application startup) 
         var initializer = _host.Services.GetRequiredService<InitializationEngine>();

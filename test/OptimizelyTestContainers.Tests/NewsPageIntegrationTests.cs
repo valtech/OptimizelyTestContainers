@@ -19,6 +19,7 @@ public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCo
 
         webHostBuilder.ConfigureServices(services =>
         {
+            // Add data importer service to setup default content for the tests
             services.AddTransient<OptimizelyDataImporter>();
         });
     }
@@ -33,6 +34,8 @@ public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCo
         var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
         var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
+        
+        // Run data importer service to setup default content for the tests
         dataImporter.Import(episerverDataFile);
         
         // Find StartPage from root
