@@ -4,13 +4,26 @@ using EPiServer.Core;
 using EPiServer.DataAccess;
 using EPiServer.Security;
 using EPiServer.Web;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Optimizely.TestContainers.Models.Pages;
+using Optimizely.TestContainers.Shared;
+using OptimizelyTestContainers.Tests.Models.Pages;
 
 namespace OptimizelyTestContainers.Tests;
 
-public class NewsPageIntegrationTest : OptimizelyIntegrationTestBase
+public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCommerce: false)
 {
+    protected override void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder)
+    {
+        webHostBuilder.UseStartup<Startup>();
+
+        webHostBuilder.ConfigureServices(services =>
+        {
+            // Add data importer service to setup default content for the tests
+            services.AddTransient<OptimizelyDataImporter>();
+        });
+    }
+    
     [Fact]
     public void Can_Create_And_Read_NewsPage()
     {
@@ -21,6 +34,8 @@ public class NewsPageIntegrationTest : OptimizelyIntegrationTestBase
         var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
         var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
+        
+        // Run data importer service to setup default content for the tests
         dataImporter.Import(episerverDataFile);
         
         // Find StartPage from root
