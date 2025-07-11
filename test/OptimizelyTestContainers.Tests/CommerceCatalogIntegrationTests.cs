@@ -3,6 +3,8 @@ using EPiServer;
 using EPiServer.Commerce.Catalog.ContentTypes;
 using EPiServer.Core;
 using EPiServer.DataAccess;
+using EPiServer.Security;
+using Mediachase.Commerce;
 using Mediachase.Commerce.Catalog;
 using Microsoft.Extensions.DependencyInjection;
 using Optimizely.TestContainers.Models.Commerce;
@@ -12,38 +14,48 @@ namespace OptimizelyTestContainers.Tests;
 public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
     [Fact]
-    public void Can_Save_Node_And_Product()
+    public void Can_Save_Catalog_And_Node_And_Product()
     {
-        // Arrange #1
+        // Arrange
         var referenceConverter = Services.GetRequiredService<ReferenceConverter>();
         var contentRepository = Services.GetRequiredService<IContentRepository>();
 
         var rootLink = referenceConverter.GetRootLink();
 
-        var aliensNode = contentRepository.GetDefault<NodeContent>(rootLink, CultureInfo.GetCultureInfo("en"));
-        aliensNode.Name = "Aliens";
-
-        // Act #1
-        var aliensNodeReference = contentRepository.Save(aliensNode, SaveAction.Publish);
+        var aliensCatalog = contentRepository.GetDefault<CatalogContent>(rootLink);
+        aliensCatalog.Name = "Aliens";
+        aliensCatalog.DefaultCurrency = Currency.USD;
+        aliensCatalog.DefaultLanguage = "en";
+        aliensCatalog.WeightBase = "kgs"; // From WeightBaseSelectionFactory
+        aliensCatalog.LengthBase = "cm"; // From LengthBaseSelectionFactory
         
-        // Arrange #2
+        var alienCatalogReference = contentRepository.Save(aliensCatalog, SaveAction.Publish, AccessLevel.NoAccess);
+        
+        var aliensNode = contentRepository.GetDefault<NodeContent>(alienCatalogReference, CultureInfo.GetCultureInfo("en"));
+        aliensNode.Name = "NeuralViz Aliens";
+
+        // Act
+       var aliensNodeReference = contentRepository.Save(aliensNode, SaveAction.Publish, AccessLevel.NoAccess);
+        
+        // Arrange
         var testAlienProduct = contentRepository.GetDefault<TestProduct>(aliensNodeReference, CultureInfo.GetCultureInfo("en"));
         testAlienProduct.Name = "Snarbo";
         testAlienProduct.Description = new XhtmlString("<p>Some scary facts about Aliens!</p>");
         
-        // Act #2
-         var testAlienProductReference = contentRepository.Save(testAlienProduct, SaveAction.Publish);
+        // Act
+         var testAlienProductReference = contentRepository.Save(testAlienProduct, SaveAction.Publish, AccessLevel.NoAccess);
         
-        // Assert # 1 & 2
+        // Assert
         Assert.NotNull(aliensNodeReference);
         Assert.NotNull(testAlienProductReference);
         
-        // Act #3
+        // Act
         aliensNode = contentRepository.Get<NodeContent>(aliensNodeReference);
         testAlienProduct = contentRepository.Get<TestProduct>(testAlienProductReference);
         
-        // Assert #3
-        Assert.Equal("Aliens", aliensNode.Name);
+        // Assert
+        Assert.Equal("Aliens", aliensCatalog.Name);
+        Assert.Equal("NeuralViz Aliens", aliensNode.Name);
         Assert.Equal("Snarbo", testAlienProduct.Name);
     }
 }
