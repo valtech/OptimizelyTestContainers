@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="Optimizely.TestContainers.Commerce.Tests\Optimizely.TestContainers.Commerce.Tests.csproj" Type="Classic C#" />
-  <Project Path="Optimizely.TestContainers.Commerce\Optimizely.TestContainers.Commerce.csproj" Type="Classic C#" />
   <Project Path="Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj" Type="Classic C#" />
   <Project Path="test/OptimizelyTestContainers.Tests/OptimizelyTestContainers.Tests.csproj" />
 </Solution>
