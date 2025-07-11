@@ -9,11 +9,12 @@ using Optimizely.TestContainers.Models.Commerce;
 
 namespace OptimizelyTestContainers.Tests;
 
-public class CommerceCatalogIntegrationTests : OptimizelyCommerceIntegrationTestBase
+public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
     [Fact]
-    public void Can_Save_Category()
+    public void Can_Save_Node_And_Product()
     {
+        // Arrange #1
         var referenceConverter = Services.GetRequiredService<ReferenceConverter>();
         var contentRepository = Services.GetRequiredService<IContentRepository>();
 
@@ -21,20 +22,28 @@ public class CommerceCatalogIntegrationTests : OptimizelyCommerceIntegrationTest
 
         var aliensNode = contentRepository.GetDefault<NodeContent>(rootLink, CultureInfo.GetCultureInfo("en"));
         aliensNode.Name = "Aliens";
-        var aliensNodeReference = contentRepository.Save(aliensNode, SaveAction.Publish);
 
+        // Act #1
+        var aliensNodeReference = contentRepository.Save(aliensNode, SaveAction.Publish);
+        
+        // Arrange #2
         var testAlienProduct = contentRepository.GetDefault<TestProduct>(aliensNodeReference, CultureInfo.GetCultureInfo("en"));
         testAlienProduct.Name = "Snarbo";
         testAlienProduct.Description = new XhtmlString("<p>Some scary facts about Aliens!</p>");
-        var testAlienProductReference = contentRepository.Save(testAlienProduct, SaveAction.Publish);
         
+        // Act #2
+         var testAlienProductReference = contentRepository.Save(testAlienProduct, SaveAction.Publish);
+        
+        // Assert # 1 & 2
         Assert.NotNull(aliensNodeReference);
         Assert.NotNull(testAlienProductReference);
-
-        aliensNode = contentRepository.Get<NodeContent>(aliensNodeReference);
-        Assert.Equal("Aliens", aliensNode.Name);
         
+        // Act #3
+        aliensNode = contentRepository.Get<NodeContent>(aliensNodeReference);
         testAlienProduct = contentRepository.Get<TestProduct>(testAlienProductReference);
+        
+        // Assert #3
+        Assert.Equal("Aliens", aliensNode.Name);
         Assert.Equal("Snarbo", testAlienProduct.Name);
     }
 }

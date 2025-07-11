@@ -9,7 +9,7 @@ using Optimizely.TestContainers.Models.Pages;
 
 namespace OptimizelyTestContainers.Tests;
 
-public class NewsPageIntegrationTest : OptimizelyCmsIntegrationTestBase
+public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCommerce: false)
 {
     [Fact]
     public void Can_Create_And_Read_NewsPage()
