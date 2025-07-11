@@ -36,7 +36,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj" />
-      <ProjectReference Include="..\..\src\Web\Optimizely.TestContainers.csproj" />
     </ItemGroup>
 
     <ItemGroup>

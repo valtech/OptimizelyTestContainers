@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using EPiServer.Core;
+using EPiServer.DataAbstraction;
+using EPiServer.DataAnnotations;
 
-namespace Optimizely.TestContainers.Models.Pages;
+namespace OptimizelyTestContainers.Tests.Models.Pages;
 
 /// <summary>
 /// Used for the site's start page and also acts as a container for site settings

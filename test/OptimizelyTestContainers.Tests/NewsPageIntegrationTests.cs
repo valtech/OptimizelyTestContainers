@@ -6,8 +6,8 @@ using EPiServer.Security;
 using EPiServer.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Optimizely.TestContainers.Models.Pages;
 using Optimizely.TestContainers.Shared;
+using OptimizelyTestContainers.Tests.Models.Pages;
 
 namespace OptimizelyTestContainers.Tests;
 
@@ -16,8 +16,12 @@ public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCo
     protected override void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
         webHostBuilder.UseStartup<Startup>();
-    }
 
+        webHostBuilder.ConfigureServices(services =>
+        {
+            services.AddTransient<OptimizelyDataImporter>();
+        });
+    }
     
     [Fact]
     public void Can_Create_And_Read_NewsPage()
