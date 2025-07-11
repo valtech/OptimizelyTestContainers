@@ -26,4 +26,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Translations\**\*" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Optimizely.TestContainers.Commerce.Tests\Optimizely.TestContainers.Commerce.Tests.csproj" />
+  </ItemGroup>
 </Project>

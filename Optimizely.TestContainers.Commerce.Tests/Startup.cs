@@ -2,10 +2,14 @@
 using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace Optimizely.TestContainers;
+namespace Optimizely.TestContainers.Commerce.Tests;
 
-public class StartupWithCmsAndCommerce(IWebHostEnvironment webHostingEnvironment)
+public class Startup(IWebHostEnvironment webHostingEnvironment)
 {
     public void ConfigureServices(IServiceCollection services)
     {
@@ -21,7 +25,7 @@ public class StartupWithCmsAndCommerce(IWebHostEnvironment webHostingEnvironment
             .AddCms()
             .AddCommerce()
             .AddAdminUserRegistration()
-            .AddEmbeddedLocalization<StartupWithCms>();
+            .AddEmbeddedLocalization<Startup>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

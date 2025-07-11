@@ -7,9 +7,10 @@ using EPiServer.Security;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Catalog;
 using Microsoft.Extensions.DependencyInjection;
-using Optimizely.TestContainers.Models.Commerce;
+using Optimizely.TestContainers.Commerce.Tests.Models.Commerce;
+using Optimizely.TestContainers.Shared;
 
-namespace OptimizelyTestContainers.Tests;
+namespace Optimizely.TestContainers.Commerce.Tests;
 
 public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {

@@ -1,15 +1,13 @@
-﻿using EPiServer.Framework;
+﻿using EPiServer.Data;
+using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
-using Mediachase.Data.Provider;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Optimizely.TestContainers;
 using Testcontainers.MsSql;
 
-namespace OptimizelyTestContainers.Tests;
+namespace Optimizely.TestContainers.Shared;
 
 public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetime
 {
@@ -29,10 +27,10 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
         var cmsDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Cms");
 
         string? commerceDatabaseConnectionString = null;
-        if (includeCommerce)
-        {
+        /*if (includeCommerce)
+        {*/
             commerceDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Commerce");
-        }
+        /*}*/
         
         
         // Build CMS host
@@ -42,14 +40,21 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
                 webHostBuilder
                     .ConfigureServices((context, services) =>
                     {
+                        // TODO: Only include in CMS test
                         // Add data importer service to setup default content for the tests
-                        services.AddTransient<OptimizelyDataImporter>();
+                       //services.AddTransient<OptimizelyDataImporter>();
+                        
+                        // Must be set here too for initialization to work for CMS
+                        services.Configure<DataAccessOptions>(o =>
+                        {
+                            o.SetConnectionString(cmsDatabaseConnectionString);
+                        });
                     })
                     .ConfigureAppConfiguration((context, configBuilder) =>
                     {
                         // Workaround to set separate database names inisde container
-                        if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
-                        {
+                        /*if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
+                        {*/
                             var testSettings = new Dictionary<string, string?>
                             {
                                 // TODO: Find Constant for connection string!
@@ -58,26 +63,30 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
                             };
 
                             configBuilder.AddInMemoryCollection(testSettings);
-                        }
+                        /*}*/
                     });
                 
+                // TOOD: Run startup in each test project!
                 if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
                 {
-                    webHostBuilder.UseStartup<StartupWithCmsAndCommerce>();
+                    //webHostBuilder.UseStartup<StartupWithCmsAndCommerce>();
                 }
                 else
                 {
-                    webHostBuilder.UseStartup<StartupWithCms>(); 
+                    //webHostBuilder.UseStartup<StartupWithCms>(); 
                 }
+                
+                
 
             })
             .ConfigureCmsDefaults()
            .Build();
+
+        // TOOD:Try to remove this as well!
+        //AssemblyScanner.ExcludedAssemblies.Add("Mediachase");
+        //AssemblyScanner.ExcludedAssemblies.Add("EPiServer.Commerce");
         
         // Run initialization engine (simulate application startup) 
-        
-        // TODO: Runs all initializable modules even if commerce is not included!
-        // Solve with custom IAssemblyScanner?
         var initializer = _host.Services.GetRequiredService<InitializationEngine>();
         if (initializer.InitializationState != InitializationState.Initialized)
             initializer.Initialize(); 

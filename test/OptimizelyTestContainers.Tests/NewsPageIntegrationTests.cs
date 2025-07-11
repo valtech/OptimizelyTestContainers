@@ -6,6 +6,7 @@ using EPiServer.Security;
 using EPiServer.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Optimizely.TestContainers.Models.Pages;
+using Optimizely.TestContainers.Shared;
 
 namespace OptimizelyTestContainers.Tests;
 
