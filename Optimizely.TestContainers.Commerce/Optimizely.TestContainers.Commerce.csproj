@@ -4,7 +4,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Optimizely.TestContainers.Cms</RootNamespace>
+        <RootNamespace>Optimizely.TestContainers.Commerce</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj" />
+    </ItemGroup>
 
 </Project>
