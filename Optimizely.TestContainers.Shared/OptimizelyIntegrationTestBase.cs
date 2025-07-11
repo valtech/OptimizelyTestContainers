@@ -1,6 +1,7 @@
 ﻿using EPiServer.Data;
 using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,7 @@ using Testcontainers.MsSql;
 
 namespace Optimizely.TestContainers.Shared;
 
-public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetime
+public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetime
 {
     private IHost _host = null!;
 
@@ -27,10 +28,10 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
         var cmsDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Cms");
 
         string? commerceDatabaseConnectionString = null;
-        /*if (includeCommerce)
-        {*/
+        if (includeCommerce)
+        {
             commerceDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Commerce");
-        /*}*/
+        }
         
         
         // Build CMS host
@@ -66,15 +67,17 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
                         /*}*/
                     });
                 
+                ConfiureWebHostBuilder(webHostBuilder); 
+                
                 // TOOD: Run startup in each test project!
-                if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
+                /*if (includeCommerce && !string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
                 {
-                    //webHostBuilder.UseStartup<StartupWithCmsAndCommerce>();
+                    webHostBuilder.UseStartup<Optimizely.TestContainers.Startup>();
                 }
                 else
                 {
-                    //webHostBuilder.UseStartup<StartupWithCms>(); 
-                }
+                    webHostBuilder.UseStartup<StartupWithCms>(); 
+                }*/
                 
                 
 
@@ -95,7 +98,9 @@ public class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsyncLifetim
         
         await _host.StartAsync();
     }
-    
+
+    protected abstract void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder);
+
     public async Task DisposeAsync()
     {
         await _host.StopAsync();

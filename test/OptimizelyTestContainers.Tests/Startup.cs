@@ -1,7 +1,5 @@
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.AspNetIdentity;
-using EPiServer.Commerce.Internal;
-using EPiServer.Data.SchemaUpdates;
 using EPiServer.Scheduler;
 using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Builder;
@@ -27,23 +25,6 @@ public class Startup(IWebHostEnvironment webHostingEnvironment)
             .AddCms()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
-        
-        // Remove the schema updater from the container if we're not running Commerce
-        /*if (!includeCommerce)
-        {*/
-            //services.RemoveImplementation<ISchemaUpdater, CommerceDatabaseSchemaUpdater>();
-            //services.RemoveImplementation<SchemaUpdaterBase, CommerceDatabaseSchemaUpdater>();
-        /*}*/
-
-        // TODO: Runs all initializable modules even if commerce is not included!
-        // Solve with custom IAssemblyScanner?
-        /*
-        if (!includeCommerce)
-        {
-            services.Replace(new ServiceDescriptor(typeof(IAssemblyScanner)))
-            services.AddSingleton<IAssemblyScanner, ExcludeCommerceAssemblyScanner>();
-        }
-        */
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

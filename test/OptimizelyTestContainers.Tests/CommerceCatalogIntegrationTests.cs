@@ -6,6 +6,7 @@ using EPiServer.DataAccess;
 using EPiServer.Security;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Catalog;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Optimizely.TestContainers.Commerce.Tests.Models.Commerce;
 using Optimizely.TestContainers.Shared;
@@ -14,6 +15,11 @@ namespace Optimizely.TestContainers.Commerce.Tests;
 
 public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
+    protected override void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder)
+    {
+        webHostBuilder.UseStartup<Startup>();
+    }
+    
     [Fact]
     public void Can_Save_Catalog_And_Node_And_Product()
     {
