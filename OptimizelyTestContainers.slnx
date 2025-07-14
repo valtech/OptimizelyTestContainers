@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="src/Optimizely.TestContainers.Commerce.Tests\Optimizely.TestContainers.Commerce.Tests.csproj" />
-  <Project Path="src/Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj" />
+  <Project Path="src/Optimizely.TestContainers.Commerce.Tests/Optimizely.TestContainers.Commerce.Tests.csproj" />
+  <Project Path="src/Optimizely.TestContainers.Shared/Optimizely.TestContainers.Shared.csproj" />
   <Project Path="src/OptimizelyTestContainers.Tests/OptimizelyTestContainers.Tests.csproj" />
 </Solution>
