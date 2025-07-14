@@ -14,25 +14,24 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
 {
     private IHost _host = null!;
 
-    // Since we use same container with different db names we can remove one of these :P
     private MsSqlContainer _databaseContainer = null!;
 
     protected IServiceProvider Services { get; private set; } = null!;
     
     public virtual async Task InitializeAsync()
     {
-        // Create Cms SQL Server container
+        // Create SQL Server container
         var container = await CreateDatabaseContainer();
         
-        // Create CMS databse
-        var cmsDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Cms");
+        // Create CMS database
+        var cmsDatabaseConnectionString = await CreateNamedDatabase(container, "Cms");
 
         string? commerceDatabaseConnectionString = null;
         if (includeCommerce)
         {
-            commerceDatabaseConnectionString = await CreateNamedDatabaseConnectionString(container, "Commerce");
+            // Create Commerce database
+            commerceDatabaseConnectionString = await CreateNamedDatabase(container, "Commerce");
         }
-        
         
         // Build CMS host
         _host = Host.CreateDefaultBuilder()
@@ -41,10 +40,6 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
                 webHostBuilder
                     .ConfigureServices((context, services) =>
                     {
-                        // TODO: Only include in CMS test
-                        // Add data importer service to setup default content for the tests
-                       //services.AddTransient<OptimizelyDataImporter>();
-                        
                         // Must be set here too for initialization to work for CMS
                         services.Configure<DataAccessOptions>(o =>
                         {
@@ -62,8 +57,8 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
                         configBuilder.AddInMemoryCollection(testSettings);
                     });
                 
-                // To configure aps separately with Cms and Commerce Statup files in separate projects
-                ConfiureWebHostBuilder(webHostBuilder); 
+                // To configure apps separately with Cms and Commerce Startup files in separate projects
+                ConfigureWebHostBuilder(webHostBuilder); 
             })
             .ConfigureCmsDefaults()
            .Build();
@@ -78,7 +73,7 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
         await _host.StartAsync();
     }
 
-    protected abstract void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder);
+    protected abstract void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder);
 
     public async Task DisposeAsync()
     {
@@ -89,26 +84,22 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
     
     private async Task<MsSqlContainer> CreateDatabaseContainer()
     {
-        var container = new MsSqlBuilder()
+        _databaseContainer = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
             .WithPassword("yourStrong(!)Password")
             .Build();
 
-        await container.StartAsync();
-        
-        _databaseContainer = container;
+        await _databaseContainer.StartAsync();
         
         return _databaseContainer;
     }
 
-    private async Task<string> CreateNamedDatabaseConnectionString(MsSqlContainer container, string databaseName)
+    private async Task<string> CreateNamedDatabase(MsSqlContainer container, string databaseName)
     {
-        databaseName = $"{GetType().Name}-{databaseName}";
-        
         var masterConnectionString = container.GetConnectionString();
         await using var connection = new SqlConnection(masterConnectionString);
         await connection.OpenAsync();
-        await using var command = new SqlCommand($"CREATE DATABASE [{databaseName}]", connection);
+        await using var command = new SqlCommand($"CREATE DATABASE [{GetType().Name}-{databaseName}]", connection);
         await command.ExecuteNonQueryAsync();
 
         // Workaround to set separate database names inside container
