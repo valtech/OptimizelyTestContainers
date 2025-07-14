@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimizelyTestContainers.Tests", "test\OptimizelyTestContainers.Tests\OptimizelyTestContainers.Tests.csproj", "{60DAC0B9-1D46-4D3A-BC27-4B7BE193AB4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimizelyTestContainers.Tests", "src\OptimizelyTestContainers.Tests\OptimizelyTestContainers.Tests.csproj", "{60DAC0B9-1D46-4D3A-BC27-4B7BE193AB4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimizely.TestContainers.Shared", "Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj", "{E4204C7A-7CC7-40FB-BFE2-D36B7286D7D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimizely.TestContainers.Shared", "src\Optimizely.TestContainers.Shared\Optimizely.TestContainers.Shared.csproj", "{E4204C7A-7CC7-40FB-BFE2-D36B7286D7D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimizely.TestContainers.Commerce.Tests", "Optimizely.TestContainers.Commerce.Tests\Optimizely.TestContainers.Commerce.Tests.csproj", "{63D88C12-0DF6-4C82-939C-1FF0B564B63E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Optimizely.TestContainers.Commerce.Tests", "src\Optimizely.TestContainers.Commerce.Tests\Optimizely.TestContainers.Commerce.Tests.csproj", "{63D88C12-0DF6-4C82-939C-1FF0B564B63E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
