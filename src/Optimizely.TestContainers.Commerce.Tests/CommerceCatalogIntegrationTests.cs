@@ -15,7 +15,7 @@ namespace Optimizely.TestContainers.Commerce.Tests;
 
 public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
-    protected override void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder)
+    protected override void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
         webHostBuilder.UseStartup<Startup>();
     }
@@ -57,6 +57,7 @@ public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(i
         Assert.NotNull(testAlienProductReference);
         
         // Act
+        aliensCatalog = contentRepository.Get<CatalogContent>(alienCatalogReference);
         aliensNode = contentRepository.Get<NodeContent>(aliensNodeReference);
         testAlienProduct = contentRepository.Get<TestProduct>(testAlienProductReference);
         

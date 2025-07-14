@@ -13,7 +13,7 @@ namespace OptimizelyTestContainers.Tests;
 
 public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCommerce: false)
 {
-    protected override void ConfiureWebHostBuilder(IWebHostBuilder webHostBuilder)
+    protected override void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
         webHostBuilder.UseStartup<Startup>();
 
@@ -35,7 +35,7 @@ public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCo
         var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
         var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
         
-        // Run data importer service to setup default content for the tests
+        // Run data importer service to set up default content for the tests
         dataImporter.Import(episerverDataFile);
         
         // Find StartPage from root
