@@ -96,10 +96,12 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
 
     private async Task<string> CreateNamedDatabase(MsSqlContainer container, string databaseName)
     {
+        databaseName = $"{GetType().Name}-{databaseName}";
+        
         var masterConnectionString = container.GetConnectionString();
         await using var connection = new SqlConnection(masterConnectionString);
         await connection.OpenAsync();
-        await using var command = new SqlCommand($"CREATE DATABASE [{GetType().Name}-{databaseName}]", connection);
+        await using var command = new SqlCommand($"CREATE DATABASE [{databaseName}]", connection);
         await command.ExecuteNonQueryAsync();
 
         // Workaround to set separate database names inside container
