@@ -1,8 +1,5 @@
-using EPiServer.Cms.UI.AspNetIdentity;
-using EPiServer.Core;
-using EPiServer.DataAccess;
+using EPiServer;
 using EPiServer.Scheduler;
-using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

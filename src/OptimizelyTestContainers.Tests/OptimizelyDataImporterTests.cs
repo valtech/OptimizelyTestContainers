@@ -8,33 +8,26 @@ namespace OptimizelyTestContainers.Tests;
 
 public class OptimizelyDataImporterTests
 {
-    private readonly Mock<ILogger<OptimizelyDataImporter>> _mockLogger;
-    private readonly Mock<IDataImporter> _mockDataImporter;
-    private readonly Mock<IContentEvents> _mockContentEvents;
-
-    public OptimizelyDataImporterTests()
-    {
-        _mockLogger = new Mock<ILogger<OptimizelyDataImporter>>();
-        _mockDataImporter = new Mock<IDataImporter>();
-        _mockContentEvents = new Mock<IContentEvents>();
-    }
+    private readonly Mock<ILogger<OptimizelyDataImporter>> _mockLogger = new();
+    private readonly Mock<IDataImporter> _mockDataImporter = new();
+    private readonly Mock<IContentEvents> _mockContentEvents = new();
 
     [Fact]
     public void Import_Should_Subscribe_To_PublishedContent_Event()
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
+        var mockImportLog = CreateMockImportLog();
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act
         importer.Import(tempFile);
 
         // Assert
-        _mockContentEvents.VerifyAdd(x => x.PublishedContent += It.IsAny<EventHandler<ContentEventArgs>>(), Times.Once);
+        _mockContentEvents.VerifyAdd(x => x.PublishedContent += It.IsAny<EventHandler<EPiServer.ContentEventArgs>>(), Times.Once);
 
         // Cleanup
         File.Delete(tempFile);
@@ -45,11 +38,11 @@ public class OptimizelyDataImporterTests
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
+        var mockImportLog = CreateMockImportLog();
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act
         importer.Import(tempFile);
@@ -75,12 +68,11 @@ public class OptimizelyDataImporterTests
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
-        importLog.AddError("Test error message");
+        var mockImportLog = CreateMockImportLog(errors: new List<string> { "Test error message" });
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act & Assert
         var exception = Assert.Throws<Exception>(() => importer.Import(tempFile));
@@ -95,13 +87,11 @@ public class OptimizelyDataImporterTests
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
-        importLog.AddWarning("Test warning 1");
-        importLog.AddWarning("Test warning 2");
+        var mockImportLog = CreateMockImportLog(warnings: new List<string> { "Test warning 1", "Test warning 2" });
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act
         importer.Import(tempFile);
@@ -134,11 +124,11 @@ public class OptimizelyDataImporterTests
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
+        var mockImportLog = CreateMockImportLog();
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act
         importer.Import(tempFile);
@@ -173,11 +163,11 @@ public class OptimizelyDataImporterTests
     {
         // Arrange
         var importer = new OptimizelyDataImporter(_mockLogger.Object, _mockDataImporter.Object, _mockContentEvents.Object);
-        var importLog = new TransferLog();
+        var mockImportLog = CreateMockImportLog();
         var tempFile = CreateTempImportFile();
 
         _mockDataImporter.Setup(x => x.Import(It.IsAny<Stream>(), It.IsAny<ContentReference>(), It.IsAny<ImportOptions>()))
-            .Returns(importLog);
+            .Returns(mockImportLog);
 
         // Act
         var exception = Record.Exception(() => importer.Import(tempFile));
@@ -194,5 +184,13 @@ public class OptimizelyDataImporterTests
         var tempFile = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}.episerverdata");
         File.WriteAllText(tempFile, "test content");
         return tempFile;
+    }
+    
+    private ITransferLog CreateMockImportLog(List<string>? errors = null, List<string>? warnings = null)
+    {
+        var mockLog = new Mock<ITransferLog>();
+        mockLog.SetupGet(x => x.Errors).Returns(errors ?? []);
+        mockLog.SetupGet(x => x.Warnings).Returns(warnings ?? []);
+        return mockLog.Object;
     }
 }

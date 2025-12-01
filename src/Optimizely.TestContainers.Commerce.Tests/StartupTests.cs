@@ -1,6 +1,6 @@
-using EPiServer.Commerce.Catalog;
-using EPiServer.Core;
+﻿using EPiServer;
 using EPiServer.Scheduler;
+using Mediachase.Commerce.Catalog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
