@@ -19,6 +19,7 @@
         <PackageReference Include="EPiServer.CMS" Version="12.33.1" />
         <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />
         <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
+        <PackageReference Include="Microsoft.SqlServer.DacFx" Version="170.2.70" />
     </ItemGroup>
     
 </Project>
