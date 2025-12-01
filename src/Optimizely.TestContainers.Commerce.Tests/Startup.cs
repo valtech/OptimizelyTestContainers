@@ -5,6 +5,7 @@ using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Optimizely.TestContainers.Commerce.Tests;
 
@@ -12,11 +13,12 @@ public class Startup(IWebHostEnvironment webHostingEnvironment)
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(webHostingEnvironment.ContentRootPath, "App_Data"));
+        if (webHostingEnvironment.IsDevelopment())
+        {
+            AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(webHostingEnvironment.ContentRootPath, "App_Data"));
 
-        services.Configure<SchedulerOptions>(options => options.Enabled = false);
-
-        services.AddHttpContextAccessor();
+            services.Configure<SchedulerOptions>(options => options.Enabled = false);
+        }
 
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
@@ -28,6 +30,11 @@ public class Startup(IWebHostEnvironment webHostingEnvironment)
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
         app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();

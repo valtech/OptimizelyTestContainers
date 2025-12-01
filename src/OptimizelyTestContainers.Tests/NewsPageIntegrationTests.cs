@@ -1,66 +1,70 @@
-﻿using EPiServer.Core;
-using EPiServer.DataAnnotations;
+﻿using System.Reflection;
+using EPiServer;
+using EPiServer.Core;
+using EPiServer.DataAccess;
+using EPiServer.Security;
+using EPiServer.Web;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Optimizely.TestContainers.Shared;
 using OptimizelyTestContainers.Tests.Models.Pages;
 
 namespace OptimizelyTestContainers.Tests;
 
-public class NewsPageIntegrationTests
+public class NewsPageIntegrationTest() : OptimizelyIntegrationTestBase(includeCommerce: false)
 {
-    [Fact]
-    public void NewsPage_Should_Have_ContentType_Attribute()
+    protected override void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
-        // Arrange & Act
-        var attribute = typeof(NewsPage).GetCustomAttributes(typeof(ContentTypeAttribute), false)
-            .FirstOrDefault() as ContentTypeAttribute;
+        webHostBuilder.UseStartup<Startup>();
 
-        // Assert
-        Assert.NotNull(attribute);
-        Assert.Equal(Guid.Parse("7B873919-11AC-4DF4-B9E8-09F414F76164"), Guid.Parse(attribute.GUID));
-        Assert.Equal("News Page", attribute.DisplayName);
+        webHostBuilder.ConfigureServices(services =>
+        {
+            // Add data importer service to setup default content for the tests
+            services.AddTransient<OptimizelyDataImporter>();
+        });
     }
-
+    
     [Fact]
-    public void NewsPage_Should_Inherit_From_PageData()
-    {
-        // Arrange & Act
-        var isPageData = typeof(PageData).IsAssignableFrom(typeof(NewsPage));
-
-        // Assert
-        Assert.True(isPageData);
-    }
-
-    [Fact]
-    public void Title_Property_Should_Be_Virtual()
+    public void Can_Create_And_Read_NewsPage()
     {
         // Arrange
-        var property = typeof(NewsPage).GetProperty(nameof(NewsPage.Title));
+        var repo = Services.GetRequiredService<IContentRepository>();
+        
+        // Import test data
+        var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
+        var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
+        
+        // Run data importer service to set up default content for the tests
+        dataImporter.Import(episerverDataFile);
+        
+        // Find StartPage from root
+        var startPage = repo.GetChildren<StartPage>(ContentReference.RootPage).First();
+        
+        // Setup site definition
+        var siteDefinitionRepo = Services.GetRequiredService<ISiteDefinitionRepository>();
+        siteDefinitionRepo.Save(new SiteDefinition()
+        {
+            Name = "TestSite",
+            StartPage = startPage.ContentLink,
+            SiteUrl = new Uri("http://localhost"),
+        });
 
-        // Act & Assert
-        Assert.NotNull(property);
-        Assert.True(property.GetMethod?.IsVirtual);
-    }
+        // Find first site
+        var allSites = siteDefinitionRepo.List();
+        var site = allSites.First();
+        
+        // Create NewsPage
+        var news = repo.GetDefault<NewsPage>(site.StartPage);
+        news.Name = "Alien Invasion";
+        news.Title = "Martians Landed in Stockholm";
 
-    [Fact]
-    public void NewsPage_Can_Be_Instantiated()
-    {
-        // Act
-        var newsPage = new NewsPage();
+        // Act (Save and Load NewsPage)
+        var savedRef = repo.Save(news, SaveAction.Publish, AccessLevel.NoAccess);
+        var loaded = repo.Get<NewsPage>(savedRef);
 
         // Assert
-        Assert.NotNull(newsPage);
-    }
-
-    [Fact]
-    public void Title_Property_Can_Be_Set_And_Retrieved()
-    {
-        // Arrange
-        var newsPage = new NewsPage();
-        var expectedTitle = "Test News Title";
-
-        // Act
-        newsPage.Title = expectedTitle;
-
-        // Assert
-        Assert.Equal(expectedTitle, newsPage.Title);
+        Assert.NotNull(loaded);
+        Assert.Equal("Martians Landed in Stockholm", loaded.Title);
     }
 }

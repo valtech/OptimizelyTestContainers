@@ -1,6 +1,8 @@
-using EPiServer.Commerce.Catalog;
+using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Core;
+using EPiServer.DataAccess;
 using EPiServer.Scheduler;
+using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,12 +11,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace Optimizely.TestContainers.Commerce.Tests;
+namespace OptimizelyTestContainers.Tests;
 
 public class StartupTests
 {
     [Fact]
-    public void ConfigureServices_Should_Add_CMS_And_Commerce_Services()
+    public void ConfigureServices_Should_Add_CMS_Services()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -30,9 +32,6 @@ public class StartupTests
         // Assert - Check that core CMS services are registered
         Assert.Contains(services, s => s.ServiceType == typeof(IContentRepository));
         Assert.Contains(services, s => s.ServiceType == typeof(IContentLoader));
-        
-        // Check that Commerce services are registered
-        Assert.Contains(services, s => s.ServiceType == typeof(ReferenceConverter));
     }
 
     [Fact]
@@ -70,10 +69,11 @@ public class StartupTests
         // Act
         startup.ConfigureServices(services);
 
-        // Assert - Scheduler should use default configuration
+        // Assert - Scheduler should use default configuration (enabled)
         var serviceProvider = services.BuildServiceProvider();
         var schedulerOptions = serviceProvider.GetService<IOptions<SchedulerOptions>>();
         
+        // In production, scheduler is not explicitly disabled, so it should be enabled by default
         Assert.NotNull(schedulerOptions);
     }
 
@@ -88,6 +88,7 @@ public class StartupTests
 
         var startup = new Startup(mockEnvironment.Object);
 
+        // Setup for middleware chain
         mockAppBuilder.Setup(x => x.Use(It.IsAny<Func<RequestDelegate, RequestDelegate>>()))
             .Returns(mockAppBuilder.Object);
         mockAppBuilder.Setup(x => x.New()).Returns(mockAppBuilder.Object);
@@ -119,7 +120,7 @@ public class StartupTests
         // Act
         startup.Configure(mockAppBuilder.Object, mockEnvironment.Object);
 
-        // Assert
+        // Assert - Middleware should be added
         mockAppBuilder.Verify(x => x.Use(It.IsAny<Func<RequestDelegate, RequestDelegate>>()), Times.AtLeastOnce);
     }
 
