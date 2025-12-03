@@ -13,10 +13,20 @@ using Optimizely.TestContainers.Shared;
 
 namespace Optimizely.TestContainers.Commerce.Tests;
 
+/// <summary>
+/// Integration tests for Commerce catalog functionality (catalogs, nodes, products).
+/// Tests Commerce-specific content types and operations.
+/// </summary>
+[Collection("CommerceCatalogIntegrationTests")]
 public class CommerceCatalogIntegrationTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
+    /// <summary>
+    /// Configure web host with Commerce-specific Startup and services.
+    /// The base class provides CMS, Commerce, and Find configuration automatically.
+    /// </summary>
     protected override void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
+        // Register the Startup class that configures Commerce services and content types
         webHostBuilder.UseStartup<Startup>();
     }
     

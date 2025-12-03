@@ -45,37 +45,54 @@ public abstract class OptimizelyIntegrationTestBase(bool includeCommerce) : IAsy
                         services.Configure<DataAccessOptions>(o =>
                         {
                             o.SetConnectionString(cmsDatabaseConnectionString);
+                            
                         });
+
+                        if (!string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
+                        {
+                            services.Configure<DataAccessOptions>(o =>
+                            {
+                                o.ConnectionStrings.Add(new ConnectionStringOptions
+                                {
+                                    ConnectionString = commerceDatabaseConnectionString,
+                                    Name = "EcfSqlConnection"
+                                });
+                            });
+                        }
                     })
                     .ConfigureAppConfiguration((context, configBuilder) =>
                     {
                         var testSettings = new Dictionary<string, string?>
                         {
-                            ["ConnectionStrings:EPiServerDB"] = cmsDatabaseConnectionString,
-                            ["ConnectionStrings:EcfSqlConnection"] = commerceDatabaseConnectionString,
+                            ["ConnectionStrings:EPiServerDB"] = cmsDatabaseConnectionString
                         };
-
+                        
+                        if(!string.IsNullOrWhiteSpace(commerceDatabaseConnectionString))
+                        {
+                            testSettings["ConnectionStrings:EcfSqlConnection"] = commerceDatabaseConnectionString;
+                        }
+                        
                         configBuilder.AddInMemoryCollection(testSettings);
                     });
                 
-                // To configure apps separately with Cms and Commerce Startup files in separate projects
+                // This enables the integration tests to configure apps separately with Cms and Commerce Startup files in separate projects
                 ConfigureWebHostBuilder(webHostBuilder); 
             })
             .ConfigureCmsDefaults()
            .Build();
         
-        // Run initialization engine (simulate application startup) 
+        Services = _host.Services;
+        
+        // Run initialization engine (simulate application startup)
         var initializer = _host.Services.GetRequiredService<InitializationEngine>();
         if (initializer.InitializationState != InitializationState.Initialized)
-            initializer.Initialize(); 
-        
-        Services = _host.Services;
+            initializer.Initialize();
         
         await _host.StartAsync();
     }
 
     protected abstract void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder);
-
+    
     public async Task DisposeAsync()
     {
         await _host.StopAsync();
