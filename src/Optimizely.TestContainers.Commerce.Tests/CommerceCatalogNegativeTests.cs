@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using EPiServer;
 using EPiServer.Commerce.Catalog.ContentTypes;
@@ -13,10 +14,20 @@ using Optimizely.TestContainers.Shared;
 
 namespace Optimizely.TestContainers.Commerce.Tests;
 
+/// <summary>
+/// Negative/edge case integration tests for Commerce catalog functionality.
+/// Tests error handling, validation, and edge cases for Commerce operations.
+/// </summary>
+[Collection("CommerceCatalogNegativeTests")]
 public class CommerceCatalogNegativeTests() : OptimizelyIntegrationTestBase(includeCommerce: true)
 {
+    /// <summary>
+    /// Configure web host with Commerce-specific Startup and services.
+    /// The base class provides CMS, Commerce, and Find configuration automatically.
+    /// </summary>
     protected override void ConfigureWebHostBuilder(IWebHostBuilder webHostBuilder)
     {
+        // Register the Startup class that configures Commerce services and content types
         webHostBuilder.UseStartup<Startup>();
     }
 
@@ -63,7 +74,7 @@ public class CommerceCatalogNegativeTests() : OptimizelyIntegrationTestBase(incl
         catalog.LengthBase = "cm";
 
         // Act & Assert
-        Assert.Throws<EPiServerException>(() => contentRepository.Save(catalog, SaveAction.Publish, AccessLevel.NoAccess));
+        Assert.Throws<ValidationException>(() => contentRepository.Save(catalog, SaveAction.Publish, AccessLevel.NoAccess));
     }
 
     [Fact]

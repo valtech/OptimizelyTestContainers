@@ -4,7 +4,6 @@ using EPiServer.Commerce.Catalog.DataAnnotations;
 using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.DataAnnotations;
-using Optimizely.TestContainers.Commerce.Tests.Models.Commerce;
 
 namespace Optimizely.TestContainers.Commerce.Tests.Models.Commerce;
 
@@ -19,7 +18,7 @@ public class TestProductTests
 
         // Assert
         Assert.NotNull(attribute);
-        Assert.Equal("0B06DE9B-6AE3-40FB-909E-E718CCC260AE", attribute.GUID);
+        Assert.Equal(Guid.Parse("0B06DE9B-6AE3-40FB-909E-E718CCC260AE"), Guid.Parse(attribute.GUID));
         Assert.Equal("Test Product", attribute.DisplayName);
         Assert.Equal("Test product for integration tests.", attribute.Description);
     }
