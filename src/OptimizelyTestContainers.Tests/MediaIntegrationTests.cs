@@ -270,7 +270,7 @@ public class MediaIntegrationTests() : OptimizelyIntegrationTestBase(includeComm
         Assert.Equal(expectedCopyright, loaded.Copyright);
     }
 
-    [Fact(Skip = "Fails due to known issue with VideoFile PreviewImage not persisting correctly.")]
+    [Fact]
     public void VideoFile_PreviewImage_Should_Persist_After_Save()
     {
         // Arrange

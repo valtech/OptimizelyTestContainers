@@ -9,10 +9,11 @@ public class OptimizelyDataImporter(ILogger<OptimizelyDataImporter> logger, IDat
 {
     public void Import(string importFilePath)
     {
+        /*
         contentEvents.PublishedContent += (s, e) =>
         {
             logger.LogInformation("Published: {ContentName}", e.Content.Name);
-        };
+        };*/
 
         using var stream = File.OpenRead(importFilePath);
         
@@ -28,22 +29,25 @@ public class OptimizelyDataImporter(ILogger<OptimizelyDataImporter> logger, IDat
         var importLog = dataImporter.Import(stream, ContentReference.RootPage, options);
 
         var errors = importLog.Errors.ToList();
-        var warnings = importLog.Warnings.ToList();
+        
 
-        if (errors.Count != 0)
+        if (errors.Count > 0)
         {
-            throw new Exception(errors.First());
+            throw new AggregateException(errors.Select(err => new Exception(err)));
         }
 
+        /*
+         
+        var warnings = importLog.Warnings.ToList();
         if (warnings.Count == 0)
         {
             return;
         }
-        
+
         foreach (var warning in warnings)
         {
             logger.LogWarning(warning);
             Console.WriteLine(warning);
-        }
+        }*/
     }
 }

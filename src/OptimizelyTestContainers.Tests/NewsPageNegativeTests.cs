@@ -268,6 +268,15 @@ public class NewsPageNegativeTests() : OptimizelyIntegrationTestBase(includeComm
         var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         var episerverDataFile = Path.Combine(basePath, "DefaultSiteContent.episerverdata");
         var dataImporter = Services.GetRequiredService<OptimizelyDataImporter>();
+        /* TODO: 
+           OptimizelyTestContainers.Tests.NewsPageNegativeTests.Cannot_Save_NewsPage_Without_Name (10s 443ms): Error Message:
+       System.Exception : Failed to Deserialize object to Dynamic Data Store. BinaryFormatter serialization and deserial
+      ization have been removed. See https://aka.ms/binaryformatter for more information.
+      Stack Trace:
+         at OptimizelyTestContainers.Tests.OptimizelyDataImporter.Import(String importFilePath) in D:\Git\Valtech\Optimi
+      zelyTestContainers\src\OptimizelyTestContainers.Tests\OptimizelyDataImporter.cs:line 35
+         
+        */
         dataImporter.Import(episerverDataFile);
 
         var startPage = repo.GetChildren<StartPage>(ContentReference.RootPage).First();
